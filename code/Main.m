@@ -9,8 +9,8 @@ global geom dynam param
 % load('./lib/可视化样例.mat');
 %% 参数
 % 生成初始构型
-param.nx = 2; 
-param.ny = 2;
+param.nx = 3; 
+param.ny = 3;
 param.distx = 5;
 param.disty = 5;
 param.noise = 0.0;
@@ -23,8 +23,8 @@ dynam.force = zeros(geom.Nv,2);
 
 param.Ka = 5; % ~ 5e9 N/m = 5 pN/(um)^3
 param.Kc = 2; % ~ 2e-3 N/m = 2 pN/um
-param.Kv = 100; % 1e4 N s/m^2 = 10 pN s/um^2
-param.A0 = 3*sqrt(3)/2; % (um)^2
+param.Kv = 1000; % 1e4 N s/m^2 = 10 pN s/um^2
+param.A0 = 3*sqrt(3)/2*param.distx*param.disty; % (um)^2
 param.P = 0.1; % 1e2 N/m^2 = 0.1 pN/um^2
 param.H = 5; % ~ 5 um
 
@@ -65,6 +65,7 @@ end
 % command2 = 'magick *.jpg Ani.gif';
 % system(command1,command2);
 delete ./fig/*
+
 %% subfunctions
 function y = before_after(list, x)
 % 实现一个数组的首尾循环的索引操作

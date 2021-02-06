@@ -28,7 +28,7 @@ for i = 1:Nc
         % 计算顶点j处面积力的方向，由顶点j的邻居细胞决定
         idx = vList(j);
         coord = vertices(idx, :);
-        nb_idx = vNVI_v{idx};
+        nb_idx = before_after(vList,idx);
         nb_coord = vertices(nb_idx, :); 
         s_plus = nb_coord(1,:) - coord;
         s_minus = nb_coord(2,:) - coord;
@@ -52,7 +52,7 @@ for i = 1:Nc
     for j = 1:length(vList)
         idx = vList(j);
         coord = vertices(idx,:);
-        nb_idx = vNVI_v{idx};
+        nb_idx = before_after(vList,idx);
         nb_coord = vertices(nb_idx,:);
         s_plus = nb_coord(1,:) - coord;
         s_minus = nb_coord(2,:) - coord;
@@ -67,7 +67,7 @@ dynam.force = F_a + F_c ;
 end
 
 
-%% subfunction
+%% subfunctions
 function dir = bisect(a, b)
     % 计算两个向量a，b 的角平分线向量，方向默认与a b 成锐角
     %   input: a,b: 1x2 的数组向量
@@ -78,3 +78,27 @@ function dir = bisect(a, b)
         dir = [a(2),-a(1)];
     end
 end
+
+function y = before_after(list, x)
+% 实现一个数组的首尾循环的索引操作
+%     input: list: 如题，一个固定长度的列表；
+%            x: 列表中某个元素；
+%     output: y = [before, after]将列表首尾相接，before是x之前的元素，after是x之后的元素
+    index = find(list==x);
+    if isempty(index)
+        error('数组里没有要找的元素，也就没有前元和后元！');
+    elseif index == length(list)
+        afterIndex = 1;
+        beforeIndex = index-1;
+    elseif index == 1
+        afterIndex = index+1;
+        beforeIndex = length(list);
+    else 
+        afterIndex = index+1;
+        beforeIndex = index-1;
+    end
+    before = list(beforeIndex);
+    after = list(afterIndex);
+    y = [before, after];
+end
+
