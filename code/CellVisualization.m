@@ -13,7 +13,7 @@
 %      Update : 2021-1-1
 
 function CellVisualization(varargin)
-    global geom
+    global geom param
     fig = figure;
     
 %     if length(varargin) == 2    %vertices,cell_v
@@ -29,8 +29,9 @@ function CellVisualization(varargin)
     Vertices = geom.vertices;
     Faces = geom.cell_v;
     for k = 1:length(Faces)
-          patch('vertices',Vertices,'Faces', Faces{k},...
-          'EdgeColor','b','FaceColor','r','LineWidth',2,'FaceAlpha',0.2);
+        patch('vertices',Vertices,'Faces', Faces{k},...
+        'EdgeColor','b','FaceColor','r','LineWidth',2,'FaceAlpha',0.2);
+        set(gca,'xlim',[0,1.2*param.nx*param.distx],'ylim',[0,1.2*param.ny*param.disty]);
     end
     
 end

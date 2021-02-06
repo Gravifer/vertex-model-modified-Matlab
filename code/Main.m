@@ -5,26 +5,28 @@ close all;
 
 %% 变量声明
 global geom dynam param 
-%%
-load('./lib/可视化样例.mat');
+% %%
+% load('./lib/可视化样例.mat');
 %% 参数
+% 生成初始构型
+param.nx = 2; 
+param.ny = 2;
+param.distx = 5;
+param.disty = 5;
+param.noise = 0.0;
+Planar_Sheet_2D('hexagonal');
+
 geom.Nc = length(geom.cell_v(:,1));
 geom.Nv = length(geom.vertices(:,1));
 
 dynam.force = zeros(geom.Nv,2);
 
-param.Ka = 2; % ~ 5e9 N/m = 5 pN/(um)^3
-param.Kc = 1; % ~ 2e-3 N/m = 2 pN/um
-param.Kv = 0.01;
+param.Ka = 5; % ~ 5e9 N/m = 5 pN/(um)^3
+param.Kc = 2; % ~ 2e-3 N/m = 2 pN/um
+param.Kv = 100; % 1e4 N s/m^2 = 10 pN s/um^2
 param.A0 = 3*sqrt(3)/2; % (um)^2
-% % 生成初始构型
-% param.nx = 3; 
-% param.ny = 3;
-% param.distx = 1.0;
-% param.disty = 1.0;
-% param.noise = 0.0;
-% Planar_Sheet_2D('hexagonal')
-
+param.P = 0.1; % 1e2 N/m^2 = 0.1 pN/um^2
+param.H = 5; % ~ 5 um
 
 %% test history
 % % figure;
@@ -44,20 +46,25 @@ param.A0 = 3*sqrt(3)/2; % (um)^2
 
 %% 主循环
 timestep = 10;
-dt = 1;
+dt = 0.5;
 mkdir fig
 
 for i = 1:timestep
     geom_update();
     dynam_update();
-    geom.vertices = geom.vertices - param.Kv*dt*dynam.force;
+    for j = 1:geom.Nv
+        geom.vertices(j,:) =  geom.vertices(j,:) + dt*dynam.force(j,:)/param.Kv;
+    end
     CellVisualization(geom);
     name = ['./fig/DemoNo.',num2str(i),'.jpg'];
     print('-dtiff','-r300',name);
     close
 end
 
-movefile ./fig/*.jpg
+% command1 = 'cd C:\Users\Lenovo\Desktop\毕业设计\2020-12-30程序\顶点模型（自由边界）Matlab\fig ';
+% command2 = 'magick *.jpg Ani.gif';
+% system(command1,command2);
+delete ./fig/*
 %% subfunctions
 function y = before_after(list, x)
 % 实现一个数组的首尾循环的索引操作

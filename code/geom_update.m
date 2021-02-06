@@ -7,6 +7,7 @@ global geom
 Nc = geom.Nc;
 Nv = geom.Nv;
 cell_v = geom.cell_v;
+vertices = geom.vertices;
 %% 从cell_v计算vNCI_c: vertices' Neighbour Cell Index written by index of cell_v
 % 未逆时针排序
 vNCI_c = cell(Nv,1);
@@ -36,6 +37,22 @@ end
 clear i vlist j ba nviList 
 geom.vNVI_v = vNVI_v;
 
+%% 计算每个顶点的s数组
+% 每个顶点从属于周围的几个细胞。在每个细胞中，该顶点有且仅有两个邻居顶点。
+% 定义在某个细胞中，两个邻居顶点的距离为s。按照该顶点在vNCI_c中邻居细胞的顺序，分别计算对应细胞的s，形成一个数组。
+s = cell(Nv,1);
+for i = 1:Nv
+    nci = geom.vNCI_c{i};
+    ss = zeros(length(nci),1)';
+    for j = 1:length(nci)
+        clist = cell_v{nci(j)};
+        nb_list = before_after(clist,i);
+        ss(j) = norm(vertices(nb_list(1),:)-vertices(nb_list(2),:));
+    end
+    s{i} = ss;
+end
+geom.s = s;
+clear s i nci ss j clist nb_clist ss
 end
 
 
