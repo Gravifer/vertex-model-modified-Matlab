@@ -1,8 +1,8 @@
 function dynam_update()
-% ¸ù¾İgeom¶ÔÏóÖĞ°üº¬µÄ¼¸ºÎĞÅÏ¢¼ÆËãÈçÏÂÁ¦ĞÅÏ¢£º
+% æ ¹æ®geomå¯¹è±¡ä¸­åŒ…å«çš„å‡ ä½•ä¿¡æ¯è®¡ç®—å¦‚ä¸‹åŠ›ä¿¡æ¯ï¼š
 % force
 % stress
-%% ±äÁ¿ÉùÃ÷
+%% å˜é‡å£°æ˜
 global geom dynam param
 
 Nv = geom.Nv;
@@ -15,17 +15,17 @@ s = geom.s;
 Ka = param.Ka;
 Kc = param.Kc;
 A0 = param.A0;
-%% ´Ó¹¹ĞÍ¼ÆËãÃæ»ıÁ¦F_a : Areal Force(¿ÉÓëÖÜ³¤Á¦¼ÆËãºÏ²¢Ñ­»·)
-%Ãæ»ıÁ¦´óĞ¡µÈÓÚ-Ka*s(A-A0)r_norm£¬·½Ïò´¹Ö±ÓÚ¶¥µãµÄÁ½¸öÁÚ¾Ó¶¥µãµÄÁ¬ÏßÖ¸ÏòÏ¸°ûÍâ²à,
-%²Î¿¼ÎÄÏ×£º[Liu,Z.Y.2020]Mesoscopic dynamic model of epithelial cell division with cell-cell junction effects
-F_a = zeros(Nv,2); %F_aÊÇÒ»¸öNvx2µÄÊı×é£¬Ã¿Ò»ĞĞ¶ÔÓ¦Ò»¸ö¶¥µãÉÏ×÷ÓÃµÄÃæ»ıÁ¦µÄ×ÜºÍ
+%% ä»æ„å‹è®¡ç®—é¢ç§¯åŠ›F_a : Areal Force(å¯ä¸å‘¨é•¿åŠ›è®¡ç®—åˆå¹¶å¾ªç¯)
+%é¢ç§¯åŠ›å¤§å°ç­‰äº-Ka*s(A-A0)r_normï¼Œæ–¹å‘å‚ç›´äºé¡¶ç‚¹çš„ä¸¤ä¸ªé‚»å±…é¡¶ç‚¹çš„è¿çº¿æŒ‡å‘ç»†èƒå¤–ä¾§,
+%å‚è€ƒæ–‡çŒ®ï¼š[Liu,Z.Y.2020]Mesoscopic dynamic model of epithelial cell division with cell-cell junction effects https://doi.org/10.1103/PhysRevE.102.012405
+F_a = zeros(Nv,2); %F_aæ˜¯ä¸€ä¸ªNvx2çš„æ•°ç»„ï¼Œæ¯ä¸€è¡Œå¯¹åº”ä¸€ä¸ªé¡¶ç‚¹ä¸Šä½œç”¨çš„é¢ç§¯åŠ›çš„æ€»å’Œ
 for i = 1:Nc
     vList = cell_v{i};
-    % ¼ÆËãÃæ»ıÁ¦´óĞ¡
+    % è®¡ç®—é¢ç§¯åŠ›å¤§å°
     polyin = polyshape(vertices(vList, :));
     Ai = area(polyin);
     for j = 1:length(vList)
-        % ¼ÆËã¶¥µãj´¦Ãæ»ıÁ¦µÄ·½Ïò£¬ÓÉ¶¥µãjµÄÁÚ¾ÓÏ¸°û¾ö¶¨
+        % è®¡ç®—é¡¶ç‚¹jå¤„é¢ç§¯åŠ›çš„æ–¹å‘ï¼Œç”±é¡¶ç‚¹jçš„é‚»å±…ç»†èƒå†³å®š
         idx = vList(j);
         coord = vertices(idx, :);
         nb_idx = before_after(vList,idx);
@@ -35,7 +35,7 @@ for i = 1:Nc
         s = 0.5 * (norm(s_plus) + norm(s_minus));
         line = (s_plus - s_minus)/norm(s_plus - s_minus);
         dir = [line(2),-line(1)];
-        if ~isinterior(polyin,(dir + coord)*0.01) % È·±£·½Ïò³¯ÄÚ£¬Á¦µÄ×îÖÕ·½Ïò³¯Íâ
+        if ~isinterior(polyin,(dir + coord)*0.01) % ç¡®ä¿æ–¹å‘æœå†…ï¼ŒåŠ›çš„æœ€ç»ˆæ–¹å‘æœå¤–
             dir = -dir;
         end
         F_a(idx, :) = F_a(idx, :) + (-Ka*s*(Ai-A0)*dir - param.P*param.H*dir);
@@ -43,9 +43,9 @@ for i = 1:Nc
 end
 clear i vList polyin Ai j idx coord nb_idx nb_coord s_plus s_minus s line dir
 
-%% ´Ó¹¹ĞÍ¼ÆËãÖÜ³¤Á¦F_c : Contraction Force
-%ÖÜ³¤Á¦´óĞ¡µÈÓÚ-Kc*s_minusºÍ-Kc*s_plus, ·½ÏòÑØ×ÅÁ½ÌõÁÚ±ßÖ¸ÏòÁÚ¾Ó¶¥µã
-%²Î¿¼ÎÄÏ×£º[Liu,Z.Y.2020]Mesoscopic dynamic model of epithelial cell division with cell-cell junction effects
+%% ä»æ„å‹è®¡ç®—å‘¨é•¿åŠ›F_c : Contraction Force
+%å‘¨é•¿åŠ›å¤§å°ç­‰äº-Kc*s_minuså’Œ-Kc*s_plus, æ–¹å‘æ²¿ç€ä¸¤æ¡é‚»è¾¹æŒ‡å‘é‚»å±…é¡¶ç‚¹
+%å‚è€ƒæ–‡çŒ®ï¼š[Liu,Z.Y.2020]https://doi.org/10.1103/PhysRevE.102.012405
 F_c = zeros(Nv,2);
 for i = 1:Nc
     vList = cell_v{i};
@@ -69,9 +69,9 @@ end
 
 %% subfunctions
 function dir = bisect(a, b)
-    % ¼ÆËãÁ½¸öÏòÁ¿a£¬b µÄ½ÇÆ½·ÖÏßÏòÁ¿£¬·½ÏòÄ¬ÈÏÓëa b ³ÉÈñ½Ç
-    %   input: a,b: 1x2 µÄÊı×éÏòÁ¿
-    %   output: dir: ½ÇÆ½·ÖÏßÏòÁ¿ 1x2Êı×é
+    % è®¡ç®—ä¸¤ä¸ªå‘é‡aï¼Œb çš„è§’å¹³åˆ†çº¿å‘é‡ï¼Œæ–¹å‘é»˜è®¤ä¸a b æˆé”è§’
+    %   input: a,b: 1x2 çš„æ•°ç»„å‘é‡
+    %   output: dir: è§’å¹³åˆ†çº¿å‘é‡ 1x2æ•°ç»„
     dir = (a/norm(a) + b/norm(b))/norm(a/norm(a) + b/norm(b));
 
     if norm(dir)==0
@@ -80,13 +80,13 @@ function dir = bisect(a, b)
 end
 
 function y = before_after(list, x)
-% ÊµÏÖÒ»¸öÊı×éµÄÊ×Î²Ñ­»·µÄË÷Òı²Ù×÷
-%     input: list: ÈçÌâ£¬Ò»¸ö¹Ì¶¨³¤¶ÈµÄÁĞ±í£»
-%            x: ÁĞ±íÖĞÄ³¸öÔªËØ£»
-%     output: y = [before, after]½«ÁĞ±íÊ×Î²Ïà½Ó£¬beforeÊÇxÖ®Ç°µÄÔªËØ£¬afterÊÇxÖ®ºóµÄÔªËØ
+% å®ç°ä¸€ä¸ªæ•°ç»„çš„é¦–å°¾å¾ªç¯çš„ç´¢å¼•æ“ä½œ
+%     input: list: å¦‚é¢˜ï¼Œä¸€ä¸ªå›ºå®šé•¿åº¦çš„åˆ—è¡¨ï¼›
+%            x: åˆ—è¡¨ä¸­æŸä¸ªå…ƒç´ ï¼›
+%     output: y = [before, after]å°†åˆ—è¡¨é¦–å°¾ç›¸æ¥ï¼Œbeforeæ˜¯xä¹‹å‰çš„å…ƒç´ ï¼Œafteræ˜¯xä¹‹åçš„å…ƒç´ 
     index = find(list==x);
     if isempty(index)
-        error('Êı×éÀïÃ»ÓĞÒªÕÒµÄÔªËØ£¬Ò²¾ÍÃ»ÓĞÇ°ÔªºÍºóÔª£¡');
+        error('æ•°ç»„é‡Œæ²¡æœ‰è¦æ‰¾çš„å…ƒç´ ï¼Œä¹Ÿå°±æ²¡æœ‰å‰å…ƒå’Œåå…ƒï¼');
     elseif index == length(list)
         afterIndex = 1;
         beforeIndex = index-1;
